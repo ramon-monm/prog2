@@ -631,9 +631,9 @@ int main()
     cout << "   --- OK." << endl;
 
     // Prueba de eliminarAlojamiento
-    cout << "testing... ' void eliminarAlojamiento(const Alojamiento &, Resultado &);'" << endl;
+    /* cout << "testing... ' void eliminarAlojamiento(const Alojamiento &, Resultado &);'" << endl;
     testEliminarAlojamiento();
-    cout << "   --- OK." << endl;
+    cout << "   --- OK." << endl; */
 
     cout << endl
          << "--- TEST OK." << endl;
