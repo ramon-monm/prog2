@@ -232,16 +232,16 @@ namespace bblProg2
     //  Mínimo de noches:    <minimo_noches>
     //  Disponibilidad/año:  <disponibilidad_365>
     void Alojamiento::escribir() const {
-        cout<<"ID alojamiento"<<id_alojamiento<<endl;
-        cout<<"Nombre alojamiento"<<nombre<<endl;
-        cout<<"ID anfitrión"<<id_anfitrion<<endl;
-        cout<<"Nombre anfitrión"<<nombre_anfitrion<<endl;
-        cout<<"Barrio (área)"<<barrio<<endl;
-        cout<<"Localización"<<latitud<<" "<<longitud<<endl;
-        cout<<"Tipo de alojamiento"<<tipo_alojamiento<<endl;
-        cout<<"Precio por noche"<<precio<<endl;
-        cout<<"Mínimo de noches"<<minimo_noches<<endl;
-        cout<<"Disponibilidad/año"<<disponibilidad_365<<endl;
+        cout<<"ID alojamiento"<<'\t'<<id_alojamiento<<endl;
+        cout<<"Nombre alojamiento"<<'\t'<<nombre<<endl;
+        cout<<"ID anfitrion"<<'\t'<<id_anfitrion<<endl;
+        cout<<"Nombre anfitrion"<<'\t'<<nombre_anfitrion<<endl;
+        cout<<"Barrio (area)"<<'\t'<<barrio<<endl;
+        cout<<"Localizacion"<<'\t'<<latitud<<" "<<longitud<<endl;
+        cout<<"Tipo de alojamiento"<<'\t'<<tipo_alojamiento<<endl;
+        cout<<"Precio por noche"<<'\t'<<precio<<endl;
+        cout<<"Minimo de noches"<<'\t'<<minimo_noches<<endl;
+        cout<<"Disponibilidad/ano"<<'\t'<<disponibilidad_365<<endl;
     }
 
     // Lee de fichero los datos correspondientes a un alojamiento.

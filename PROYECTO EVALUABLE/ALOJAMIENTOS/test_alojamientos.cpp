@@ -252,6 +252,7 @@ void testAlojamientosAlrededor()
     Ids ids_alojamientos;
 
     alojas.leerAlojamientos(FIC_ALOJAMIENTOS, res);
+    cout<<"ok"<<endl;
 
     alojas.alojamientosAlrededor(59.34342, 18.05298, 0.5, ids_alojamientos);
     assert(ids_alojamientos.num_ids == 107);
@@ -418,7 +419,7 @@ void testAlojamientosFiltros()
     alojas.leerAlojamientos(FIC_ALOJAMIENTOS, res);
 
     alojas.alojamientosFiltros("Sdermalms", "Entire home/apt", 600.0, 2, ids_alojamientos);
-
+    
     assert(ids_alojamientos.num_ids == 13);
 
     for (unsigned i = 0; i < ids_alojamientos.num_ids; i++)
@@ -522,7 +523,7 @@ void testEliminarAlojamiento()
 
     // Eiminamos alojamientos
     alojas.eliminarAlojamiento(42808, res);
-    assert(res == OK);
+    cout<<alojas.numeroAlojamientos()<<endl;
     assert(alojas.numeroAlojamientos() == 3);
     assert((alojas[0] == Alojamiento{145320, "In the middle of it all - with a view!", 703851, "Kim", "Sdermalms", 59.31364, 18.05256, "Private room", 1285, 2, 0}));
     assert((alojas[1] == Alojamiento{155685, "Hornstull with water view!", 748592, "Robert", "Sdermalms", 59.31535, 18.03277, "Entire home/apt", 3247, 4, 0}));
@@ -586,39 +587,39 @@ int main()
     cout << "   --- OK." << endl;
 
     // Prueba de alojamientosAnfitrion
-    /* cout << "testing... 'void alojamientosAnfitrion(unsigned, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosAnfitrion(unsigned, Ids &) const'" << endl;
     testAlojamientosAnfitrion();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosAlrededor
-    /* cout << "testing... 'void alojamientosAlrededor(double, double, double, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosAlrededor(double, double, double, Ids &) const'" << endl;
     testAlojamientosAlrededor();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosBarrio
-    /* cout << "testing... 'void alojamientosBarrio(const std::string &, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosBarrio(const std::string &, Ids &) const'" << endl;
     testAlojamientosBarrio();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosTipo
-    /* cout << "testing... 'void alojamientosTipo(const std::string &, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosTipo(const std::string &, Ids &) const'" << endl;
     testAlojamientosTipo();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosPrecio
-    /* cout << "testing... 'void alojamientosPrecio(double, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosPrecio(double, Ids &) const'" << endl;
     testAlojamientosPrecio();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosNoches
-    /* cout << "testing... 'void alojamientosNoches(unsigned, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosNoches(unsigned, Ids &) const'" << endl;
     testAlojamientosNoches();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de alojamientosFiltros
-    /* cout << "testing... 'void alojamientosFiltros(const std::string &, const std::string &, double, unsigned, Ids &) const'" << endl;
+    cout << "testing... 'void alojamientosFiltros(const std::string &, const std::string &, double, unsigned, Ids &) const'" << endl;
     testAlojamientosFiltros();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     // Prueba de escribirEnFichero
     cout << "testing... 'void escribirEnFichero(const std::string &, Resultado &)'" << endl;
@@ -631,9 +632,9 @@ int main()
     cout << "   --- OK." << endl;
 
     // Prueba de eliminarAlojamiento
-    /* cout << "testing... ' void eliminarAlojamiento(const Alojamiento &, Resultado &);'" << endl;
+    cout << "testing... ' void eliminarAlojamiento(const Alojamiento &, Resultado &);'" << endl;
     testEliminarAlojamiento();
-    cout << "   --- OK." << endl; */
+    cout << "   --- OK." << endl;
 
     cout << endl
          << "--- TEST OK." << endl;

@@ -1,3 +1,4 @@
+
 /***********************************************************************************
  * Fichero alojamientos.cpp para la implementación de atributos y métodos de la clase
  * Alojamientos para la gestión de la información correspondiente a una lista de
@@ -147,18 +148,23 @@ namespace bblProg2
         //                          de los alojamientos pertenecientes a ese anfitrion
         //                          (en orden creciente).
         void Alojamientos::alojamientosAnfitrion(unsigned id_anfitrion, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && alojamientos[i].consultarIdAnfitrion()==id_anfitrion; ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;    
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(alojamientos[i].consultarIdAnfitrion()==id_anfitrion) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
-            for(unsigned i=0; ids_alojamientos.num_ids>1 && i<ids_alojamientos.num_ids; ++i) {
-                unsigned aux;
-                for(unsigned j=i+1; i<ids_alojamientos.num_ids && ids_alojamientos.ids[j]<ids_alojamientos.ids[i]; ++j) {
-                    aux=ids_alojamientos.ids[i];
-                    ids_alojamientos.ids[i]=ids_alojamientos.ids[j];
-                    ids_alojamientos.ids[j]=aux;
-                }     
+            for(unsigned i=0; i<ids_alojamientos.num_ids; ++i) {
+                unsigned pos_menor=i;
+                for(unsigned j=i+1; j<ids_alojamientos.num_ids; ++j) {
+                    if(ids_alojamientos.ids[j]<ids_alojamientos.ids[pos_menor]) {
+                        pos_menor=j;
+                    }
+                }
+                unsigned aux=ids_alojamientos.ids[i];
+                ids_alojamientos.ids[i]=ids_alojamientos.ids[pos_menor];
+                ids_alojamientos.ids[pos_menor]=aux;
             }
         }
         
@@ -173,10 +179,12 @@ namespace bblProg2
         //                          que están, como mucho, a esa distancia
         //                          del punto dado.
         void Alojamientos::alojamientosAlrededor(double latitud, double longitud, double kms, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && distanciaHaversine(latitud, longitud, alojamientos[i].consultarLatitud(), alojamientos[i].consultarLongitud()<=kms); ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(distanciaHaversine(latitud, longitud, alojamientos[i].consultarLatitud(), alojamientos[i].consultarLongitud())<=kms) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
         }
 
@@ -186,10 +194,12 @@ namespace bblProg2
         //   - barrio (E): un barrio de la ciudad
         //   - ids_alojamientos (S): lista de los alojamientos de ese barrio
         void Alojamientos::alojamientosBarrio(const std::string &barrio, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && alojamientos[i].consultar_barrio()==barrio; ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(alojamientos[i].consultar_barrio()==barrio) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
         }
 
@@ -199,10 +209,12 @@ namespace bblProg2
         //  - tipo_alojamiento (E): tipo de alojamiento
         //  - ids_alojamientos (S): lista de alojamientos de ese tipo
         void Alojamientos::alojamientosTipo(const std::string &tipo_alojamiento, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && alojamientos[i].consultarTipoAlojamiento()==tipo_alojamiento; ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(alojamientos[i].consultarTipoAlojamiento()==tipo_alojamiento) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
         }
 
@@ -213,10 +225,12 @@ namespace bblProg2
         //  - ids_alojamientos (S): lista de alojamientos con precio igual o inferior
         //                          al precio dado
         void Alojamientos::alojamientosPrecio(double precio, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && alojamientos[i].consultarPrecio()<=precio; ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(alojamientos[i].consultarPrecio()<=precio) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
         }
 
@@ -229,10 +243,12 @@ namespace bblProg2
         //                          de alquiler menor o igual que el número de noches
         //                          dado.
         void Alojamientos::alojamientosNoches(unsigned num_noches, Ids &ids_alojamientos) const {
-            for(unsigned i=0, j=0; i<num_alojamientos && alojamientos[i].consultarMinimoNoches()<=num_noches; ++i) {
-                ids_alojamientos.ids[j]=alojamientos[i].consultarIdAlojamiento();
-                ++j;
-                ++ids_alojamientos.num_ids;
+            ids_alojamientos={};
+            for(unsigned i=0; i<num_alojamientos; ++i) {
+                if(alojamientos[i].consultarMinimoNoches()<=num_noches) {
+                    ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                    ++ids_alojamientos.num_ids;
+                }    
             }
         }
 
@@ -260,33 +276,15 @@ namespace bblProg2
                                  double precio,
                                  unsigned num_noches,
                                  Ids &ids_alojamientos) const {
-                                    Ids aux_barrio={}, aux_tipo={}, aux_precio={}, aux_num_noches={};
-                                    if(!barrio.empty()) {
-                                        alojamientosBarrio(barrio, aux_barrio);
-                                    }
-                                    else {listaAlojamientos(aux_barrio);}
-                                    if(!tipo_alojamiento.empty()) {
-                                        alojamientosTipo(tipo_alojamiento, aux_tipo);
-                                    }
-                                    else {listaAlojamientos(aux_tipo);}
-                                    if(precio>0) {
-                                        alojamientosPrecio(precio, aux_precio);
-                                    }
-                                    else {listaAlojamientos(aux_precio);}
-                                    if(num_noches>0) {
-                                        alojamientosNoches(num_noches, aux_num_noches);
-                                    }
-                                    else {listaAlojamientos(aux_num_noches);}
-                                    for(unsigned i=0, j=0; i<aux_barrio.num_ids; ++i) {
-                                        for(unsigned k=0; k<aux_tipo.num_ids && aux_tipo.ids[k]==aux_barrio.ids[i]; ++k) {
-                                            for(unsigned l=0; k<aux_precio.num_ids && aux_precio.ids[l]==aux_barrio.ids[i]; ++l) {
-                                                for(unsigned m=0; k<aux_num_noches.num_ids && aux_num_noches.ids[m]==aux_barrio.ids[i]; ++m) {
-                                                   ids_alojamientos.ids[j]=aux_barrio.ids[i];
-                                                    ++j;
-                                                    ++ids_alojamientos.num_ids; 
-                                                }
-                                            }
-                                        }
+                                    ids_alojamientos={};
+                                    for(unsigned i=0; i<num_alojamientos; ++i) {
+                                        if(!(!barrio.empty() && alojamientos[i].consultar_barrio()!=barrio) && 
+                                        !(!tipo_alojamiento.empty() && alojamientos[i].consultarTipoAlojamiento()!=tipo_alojamiento) &&
+                                        !(precio>0 && alojamientos[i].consultarPrecio()>precio) && 
+                                        !(num_noches>0 && alojamientos[i].consultarMinimoNoches()>num_noches)) {
+                                            ids_alojamientos.ids[ids_alojamientos.num_ids]=alojamientos[i].consultarIdAlojamiento();
+                                            ++ids_alojamientos.num_ids;
+                                        }    
                                     }
                                 }
 
@@ -313,6 +311,7 @@ namespace bblProg2
                 for(unsigned i=0; i<num_alojamientos; ++i) {
                     alojamientos[i].escribir(fic);
                 }
+                fic.close();
                 res = OK;
             }
             else
@@ -423,7 +422,6 @@ namespace bblProg2
             buscarAlojamiento(id_alojamiento, i, encontrado);
             if(encontrado) {
                 cerrarHueco(i);
-                --num_alojamientos;
                 res=OK;
             }
             else {
@@ -502,6 +500,7 @@ namespace bblProg2
         //  - posicion (E): posición a partir de cual se abre hueco
         // PRECONDICIÓN: posicion <= num_alojamientos
         void Alojamientos::abrirHueco(unsigned posicion) {
+            assert(posicion<=num_alojamientos);
             for(unsigned i=num_alojamientos; i>posicion; --i) {
                 alojamientos[i]=alojamientos[i-1];
             }
@@ -517,10 +516,10 @@ namespace bblProg2
         //  - posicion (E): posición a partir de cual se cierra hueco
         // PRECONDICIÓN: posicion < num_alojamientos
         void Alojamientos::cerrarHueco(unsigned posicion) {
+            assert(posicion<num_alojamientos);
             for(unsigned i=posicion; i<num_alojamientos; ++i) {
                 alojamientos[i]=alojamientos[i+1];
             }
-            alojamientos[num_alojamientos-1]={};
             --num_alojamientos;
         }
 } // namespace bblProg2
