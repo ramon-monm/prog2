@@ -252,7 +252,6 @@ void testAlojamientosAlrededor()
     Ids ids_alojamientos;
 
     alojas.leerAlojamientos(FIC_ALOJAMIENTOS, res);
-    cout<<"ok"<<endl;
 
     alojas.alojamientosAlrededor(59.34342, 18.05298, 0.5, ids_alojamientos);
     assert(ids_alojamientos.num_ids == 107);
@@ -419,7 +418,7 @@ void testAlojamientosFiltros()
     alojas.leerAlojamientos(FIC_ALOJAMIENTOS, res);
 
     alojas.alojamientosFiltros("Sdermalms", "Entire home/apt", 600.0, 2, ids_alojamientos);
-    
+
     assert(ids_alojamientos.num_ids == 13);
 
     for (unsigned i = 0; i < ids_alojamientos.num_ids; i++)
@@ -523,7 +522,7 @@ void testEliminarAlojamiento()
 
     // Eiminamos alojamientos
     alojas.eliminarAlojamiento(42808, res);
-    cout<<alojas.numeroAlojamientos()<<endl;
+    assert(res == OK);
     assert(alojas.numeroAlojamientos() == 3);
     assert((alojas[0] == Alojamiento{145320, "In the middle of it all - with a view!", 703851, "Kim", "Sdermalms", 59.31364, 18.05256, "Private room", 1285, 2, 0}));
     assert((alojas[1] == Alojamiento{155685, "Hornstull with water view!", 748592, "Robert", "Sdermalms", 59.31535, 18.03277, "Entire home/apt", 3247, 4, 0}));

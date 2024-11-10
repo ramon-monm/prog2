@@ -366,17 +366,19 @@ namespace bblProg2
                 }
                 else {
                     if(num_alojamientos!=0) {
-                        unsigned i=0;
-                        while(i<num_alojamientos) {
+                        unsigned i;
+                        for(i=0; i<num_alojamientos && alojamientos[i].consultarIdAlojamiento()<alojamiento.consultarIdAlojamiento(); ++i) {}
+                        /* while(i<num_alojamientos) {
                             if(alojamiento.consultarIdAlojamiento()<alojamientos[i].consultarIdAlojamiento()) {
                                 break;
                             }
                             else {
                                 ++i;
                             }
-                        }
+                        } */
                         abrirHueco(i);
                         alojamientos[i]=alojamiento;
+                        ++num_alojamientos;
                     }
                     else {
                         alojamientos[0]=alojamiento;
@@ -459,6 +461,7 @@ namespace bblProg2
                         --i;
                     }
                 }
+                fic.close();
                 res=OK;
             }
             else {
@@ -480,16 +483,12 @@ namespace bblProg2
         //  - encontrado (S): indica si se ha encontrado el id buscado
         void Alojamientos::buscarAlojamiento(unsigned id_alojamiento, unsigned &posicion, bool &encontrado) const {
             encontrado=false;
-            unsigned i=0;
-            while(i<num_alojamientos) {
+            for(unsigned i=0; i<num_alojamientos && !encontrado; ++i) {
                 if(alojamientos[i].consultarIdAlojamiento()>=id_alojamiento) {
-                    encontrado=alojamientos[i].consultarIdAlojamiento()==id_alojamiento;
+                    encontrado=true;
                     posicion=i;
-                    break;
                 }
-                else {
-                    ++i;
-                }
+                encontrado=alojamientos[i].consultarIdAlojamiento()==id_alojamiento;
             }
         }
 
@@ -505,7 +504,6 @@ namespace bblProg2
                 alojamientos[i]=alojamientos[i-1];
             }
             alojamientos[posicion]={};
-            ++num_alojamientos;
         }
 
         // Cierra hueco en el array, desplazando "a la izquierda" todos
