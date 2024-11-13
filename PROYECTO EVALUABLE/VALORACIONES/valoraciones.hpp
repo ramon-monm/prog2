@@ -3,25 +3,31 @@
  * Valoraciones para la gestión de la información correspondiente a una lista de 
  * valoraciones de alojamientos turísticos.
  *
- * Alumno/a: 
+ * Alumno/a: Ramón Montoro Mazuela
  * Fecha: 
  * *********************************************************************************/
 
 ///// ¡¡¡¡COMPLETAR TODO LO NECESARIO!!!!
 
-// #ifndef ...
-// #define ...
+#ifndef __CLASE_VALORACIONES__   
+#define __CLASE_VALORACIONES__
 
 // INCLUIR LAS BIBLIOTECAS NECESARIAS
-// #include "utilidades.hpp"
-// #include "valoracion.hpp"
-// #include "palabras.hpp"
-// #include ...
+#include "utilidades.hpp"
+#include "valoracion.hpp"
+#include "palabras.hpp"
+
+#include <iostream>
 
 
 // IMPLEMENTAR LA CLASE Valoraciones DENTRO DEL NAMESPACE bblProg2
+namespace bblProg2 {
 
-// ---------------------- MÉTODOS PÚBLICOS DE LA CLASE Valoraciones
+        class Valoraciones {
+
+        // ---------------------- MÉTODOS PÚBLICOS DE LA CLASE Valoraciones
+        public:
+
         // Constructor por defecto.
         // Inicializa todas las listas (valoraciones,
         // palabras positivas y palabras negativas)
@@ -230,10 +236,18 @@
         void __consultar_elemento_pos(unsigned pos, bool val_pal, bool pos_neg, Valoracion &valoracion, std::string &palabra) const;
 
         // ----------- ATRIBUTOS (PRIVADOS)
-        // .. valoraciones; // Valoraciones (puntero a lista de valoraciones)
-        // ... num_valoraciones;  // Número de valoraciones
-        // ... pal_pos, pal_neg;  // Palabras positivas y negativas (objetos de la clase Palabras)
+        private:
 
+        struct NodoValoracion {
+                Valoracion valoracion;
+                NodoValoracion *sig;
+        };
+
+        using PtrValoracion=NodoValoracion *;
+        
+        PtrValoracion valoraciones; // Valoraciones (puntero a lista de valoraciones)
+        unsigned num_valoraciones;  // Número de valoraciones
+        Palabras pal_pos, pal_neg;  // Palabras positivas y negativas (objetos de la clase Palabras)
 
         // ----------- MÉTODOS PRIVADOS
 
@@ -288,4 +302,6 @@
         // PARÁMETROS:
         //  - lista (E): lista de valoraciones original
         PtrValoracion copiarValoraciones(PtrValoracion lista) const;
-// #endif
+        };
+}
+#endif
