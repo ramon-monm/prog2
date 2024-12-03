@@ -10,6 +10,7 @@
 #ifndef __CLASE_PALABRAS__
 #define __CLASE_PALABRAS__
 
+#include "utilidades.hpp"
 #include <string>
 
 

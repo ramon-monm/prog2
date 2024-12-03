@@ -59,21 +59,22 @@ namespace bblProg2
     // -------------------------------------------------------------------
 
     // IMPLEMENTACIÓN DE LOS MÉTODOS PÚBLICOS DE LA CLASE Palabras (completar):
-    
+
     // Constructor por defecto.
     // Inicializa a una lista de palabras vacía.
-    Palabras::Palabras(): lista{}, size{}, capacity{} {}
+    Palabras::Palabras() : lista{}, size{}, capacity{} {}
 
     // Constructor de copia
     // PARÁMETROS:
     //  - o (E): otro objeto de la misma clase
-    Palabras::Palabras(const Palabras &o): lista{o.lista}, size{o.size}, capacity{o.capacity} {}
+    Palabras::Palabras(const Palabras &o) : lista{o.lista}, size{o.size}, capacity{o.capacity} {}
 
     // Destructor
     Palabras::~Palabras() {}
 
     // Devuelve el número de palabras de la lista
-    std::size_t Palabras::numPalabras() const {
+    std::size_t Palabras::numPalabras() const
+    {
         return size;
     }
 
@@ -85,31 +86,38 @@ namespace bblProg2
     // PARÁMETROS:
     //  - pal (E): cadena de caracteres con la palabra a insertar
     //  - res (S): resultado de la operación de inserción
-    void Palabras::insertar(const std::string &pal, Resultado &res) {
-        if(buscar(pal)) {
-            res=YA_EXISTE;
+    void Palabras::insertar(const std::string &pal, Resultado &res)
+    {
+        if (buscar(pal))
+        {
+            res = YA_EXISTE;
         }
-        else{
-            bool copy=false;
-            if(capacity==0) {
-            ++capacity; // Si se hace la inserción en una lista vacía, se debe incrementar la capacidad a 1.
-            copy=true;
+        else
+        {
+            bool copy = false;
+            if (capacity == 0)
+            {
+                ++capacity; // Si se hace la inserción en una lista vacía, se debe incrementar la capacidad a 1.
+                copy = true;
             }
-            if(size==capacity) {
-                capacity*=2; // Si no caben más elementos en la lista (hay tantos elementos como capacidad), duplicamos la capacidad de la lista.
-                copy=true;
+            if (size == capacity)
+            {
+                capacity *= 2; // Si no caben más elementos en la lista (hay tantos elementos como capacidad), duplicamos la capacidad de la lista.
+                copy = true;
             }
-            if(copy) { // Deberemos copiar el array al que apunta lista solo si modificamos su capacidad para trabajar sobre él globalmente
-                string *aux=new string[capacity];
-                for(unsigned i=0; i<size; ++i) {
-                    aux[i]=lista[i];
+            if (copy)
+            { // Deberemos copiar el array al que apunta lista solo si modificamos su capacidad para trabajar sobre él globalmente
+                string *aux = new string[capacity];
+                for (unsigned i = 0; i < size; ++i)
+                {
+                    aux[i] = lista[i];
                 }
                 delete[] lista;
-                lista=aux;
+                lista = aux;
             }
-            lista[size]=pal;
+            lista[size] = pal;
             ++size;
-            res=OK;
+            res = OK;
         }
     }
 
@@ -117,10 +125,12 @@ namespace bblProg2
     // está o no en la lista de palabras.
     // PARÁMETROS:
     //  - pal (E): cadena de caracteres con la palabra a buscar
-    bool Palabras::buscar(const std::string &pal) const {
-        bool encontrada=false;
-        for(unsigned i=0; !encontrada && i<size; ++i) {
-            encontrada=lista[i]==pal;
+    bool Palabras::buscar(const std::string &pal) const
+    {
+        bool encontrada = false;
+        for (unsigned i = 0; !encontrada && i < size; ++i)
+        {
+            encontrada = lista[i] == pal;
         }
         return encontrada;
     }
@@ -132,28 +142,35 @@ namespace bblProg2
     // PARÁMETROS:
     //  - pal (E): cadena de caracteres con la palabra a eliminar
     //  - res (S): resultado de la operación de eliminación
-    void Palabras::eliminar(const std::string &pal, Resultado &res) {
-        if(!buscar(pal)) {
-            res=NO_EXISTE;
+    void Palabras::eliminar(const std::string &pal, Resultado &res)
+    {
+        if (!buscar(pal))
+        {
+            res = NO_EXISTE;
         }
-        else {
-            bool encontrada=false;
-            string *aux=new string[capacity];
-            for(unsigned i=0; i+1<size; ++i) {
-                if(!encontrada) {
-                    encontrada=lista[i]==pal;
-                    if(!encontrada) {
-                        aux[i]=lista[i];
+        else
+        {
+            bool encontrada = false;
+            string *aux = new string[capacity];
+            for (unsigned i = 0; i + 1 < size; ++i)
+            {
+                if (!encontrada)
+                {
+                    encontrada = lista[i] == pal;
+                    if (!encontrada)
+                    {
+                        aux[i] = lista[i];
                     }
                 }
-                if(encontrada) {
-                    aux[i]=lista[i+1];
+                if (encontrada)
+                {
+                    aux[i] = lista[i + 1];
                 }
             }
             delete[] lista;
-            lista=aux;
+            lista = aux;
             --size;
-            res=OK;
+            res = OK;
         }
     }
 
@@ -168,26 +185,28 @@ namespace bblProg2
     // PARÁMETROS:
     //  - nombre_fic (E): nombre del fichero
     //  - res (S): resultado de la operación de lectura de fichero
-    void Palabras::leerPalabras(const std::string &nombre_fic, Resultado &res) {
+    void Palabras::leerPalabras(const std::string &nombre_fic, Resultado &res)
+    {
         ifstream f;
         f.open(nombre_fic);
-        if(f.fail()) {
-            res=FIC_ERROR;
+        if (f.fail())
+        {
+            res = FIC_ERROR;
         }
-        else {
+        else
+        {
             string aux;
             getline(f, aux);
-            while(!f.eof() && aux[0]==';') {
+            while (!f.eof())
+            {
+                if(aux[0]!=';') {
+                    Resultado res;
+                    insertar(aux,res);
+                }
                 getline(f, aux);
             }
-            unsigned i;
-            for(i=0; i<size && !f.eof(); ++i) {
-                lista[i]=aux;
-                f>>aux;
-            }
-            lista[i]=aux;
             f.close();
-            res=OK;
+            res = OK;
         }
     }
 
@@ -197,18 +216,22 @@ namespace bblProg2
     // PARÁMETROS:
     //  - nombre_fic (E): nombre del fichero
     //  - res (S): resultado de la operación de escritura en fichero
-    void Palabras::escribirPalabras(const std::string &nombre_fic, Resultado &res) const {
+    void Palabras::escribirPalabras(const std::string &nombre_fic, Resultado &res) const
+    {
         ofstream f;
         f.open(nombre_fic);
-        if(f.fail()) {
-            res=FIC_ERROR;
+        if (f.fail())
+        {
+            res = FIC_ERROR;
         }
-        else {
-            for(unsigned i=0; i<size; ++i) {
-                f<<lista[i]<<endl;
+        else
+        {
+            for (unsigned i = 0; i < size; ++i)
+            {
+                f << lista[i] << endl;
             }
             f.close();
-            res=OK;
+            res = OK;
         }
     }
 

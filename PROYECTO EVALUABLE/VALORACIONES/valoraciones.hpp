@@ -23,7 +23,7 @@
 // IMPLEMENTAR LA CLASE Valoraciones DENTRO DEL NAMESPACE bblProg2
 namespace bblProg2 {
 
-        class Valoraciones {
+    class Valoraciones {
 
         // ---------------------- MÉTODOS PÚBLICOS DE LA CLASE Valoraciones
         public:
@@ -239,8 +239,8 @@ namespace bblProg2 {
         private:
 
         struct NodoValoracion {
-                Valoracion valoracion;
-                NodoValoracion *sig;
+            Valoracion valoracion;
+            NodoValoracion *sig;
         };
 
         using PtrValoracion=NodoValoracion *;
@@ -264,10 +264,10 @@ namespace bblProg2 {
         //  - ant (S): puntero que apunta al nodo anterior al que apunta 'ptr'
         //  - encontrada (S): indica si ha encontrado ese id de valoración o no
         void buscarValoracion(unsigned id_valoracion,
-                              PtrValoracion lista,
-                              PtrValoracion &ptr,
-                              PtrValoracion &ant,
-                              bool &encontrada) const;
+                                PtrValoracion lista,
+                                PtrValoracion &ptr,
+                                PtrValoracion &ant,
+                                bool &encontrada) const;
 
         // Inserta una valoración en la lista de valoraciones que
         // se pasa como parámetro. Si la valoración se ha podido

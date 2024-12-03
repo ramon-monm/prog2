@@ -108,6 +108,8 @@ namespace bblProg2
         borrarValoraciones(valoraciones);
     }
 
+    // MÉTODOS PRIVADOS -------------------------------------------------------------------------------------
+
     // Busca una valoración por su id_valoracion en una lista de valoraciones.
     // Devuelve un puntero 'ptr' apuntando a un nodo que contiene un id de valoración
     // mayor o igual que el que estoy buscando (o a nullptr, si no existe tal nodo),
@@ -124,7 +126,18 @@ namespace bblProg2
                             Valoraciones::PtrValoracion lista,
                             Valoraciones::PtrValoracion &ptr,
                             Valoraciones::PtrValoracion &ant,
-                            bool &encontrada) const;
+                            bool &encontrada) const {
+                                ptr=lista;
+                                ant=nullptr;
+                                encontrada=false;
+                                while(ptr!=nullptr && ptr->valoracion.consultarIdValoracion()<id_valoracion) {
+                                    ant=ptr;
+                                    ptr=ptr->sig;
+                                }
+                                if(ptr!=nullptr) {
+                                    encontrada=ptr->valoracion.consultarIdValoracion()==id_valoracion;
+                                }
+                            }
 
     // Inserta una valoración en la lista de valoraciones que
     // se pasa como parámetro. Si la valoración se ha podido
@@ -136,7 +149,36 @@ namespace bblProg2
     //  - valoracion (E): valoración a insertar
     //  - lista (ES): lista de valoraciones donde se inserta
     //  - res (S): resultado de la operación
-    void insertarValoracion(const Valoracion &valoracion, PtrValoracion &lista, Resultado &res) const;
+    void Valoraciones::insertarValoracion(const Valoracion &valoracion, PtrValoracion &lista, Resultado &res) const {
+        PtrValoracion ptr, ant;
+        bool encontrada;
+        buscarValoracion(valoracion.consultarIdValoracion(), lista, ptr, ant, encontrada);
+        if(encontrada) {
+            res=YA_EXISTE;
+        }
+        else {
+            if(ptr!=nullptr) {
+                if(ant!=nullptr) { // En posición intermedia
+                    ant->sig=new NodoValoracion;
+                    ant=ant->sig;
+                    ant->sig=ptr;
+                }
+                else { // Al principio
+                    ant=new NodoValoracion;
+                    ant->sig=lista;
+                    lista=ant;
+                }
+                ant->valoracion=valoracion;
+            }
+            else { // Inserción en lista vacía
+                ptr=new NodoValoracion;
+                ptr->valoracion=valoracion;
+                lista=ptr;
+                ptr->sig=nullptr;
+            }
+            res=OK;
+        }
+    }
 
     // Elimina una valoración cuyo identificador se pasa como parámetro
     // de la lista de valoraciones que se pasa también como parámetro.
@@ -147,18 +189,43 @@ namespace bblProg2
     //  - id_valoracion (E): id de la valoración a eliminar
     //  - lista (ES): lista de valoraciones
     //  - res (S): resultado de la operación
-    void eliminarValoracion(unsigned id_valoracion, PtrValoracion &lista, Resultado &res) const;
+    void Valoraciones::eliminarValoracion(unsigned id_valoracion, PtrValoracion &lista, Resultado &res) const {
+        PtrValoracion ptr, ant;
+        bool encontrada;
+        buscarValoracion(id_valoracion, lista, ptr, ant, encontrada);
+        if(!encontrada) {
+            res=NO_EXISTE;
+        }
+        else {
+            ptr=ptr->sig;
+            delete(ant->sig);
+            ant->sig=ptr;
+            res=OK;
+        }
+    }
 
     // Borra completamente una lista de valoraciones
     // PARÁMETROS:
     //  - lista (ES): lista de valoraciones a borrar
-    void borrarValoraciones(PtrValoracion &lista) const;
+    void Valoraciones::borrarValoraciones(PtrValoracion &lista) const {
+        PtrValoracion aux=lista;
+        while(lista!=nullptr) {
+            aux=lista;
+            lista=lista->sig;
+            delete(aux);
+        }
+    }
 
     // Devuelve una copia de la lista de valoraciones que se pasa
     // como parámetro.
     // PARÁMETROS:
     //  - lista (E): lista de valoraciones original
-    PtrValoracion copiarValoraciones(PtrValoracion lista) const;
+    Valoraciones::PtrValoracion Valoraciones::copiarValoraciones(PtrValoracion lista) const {
+        PtrValoracion copia(lista);
+        return copia;
+    }
+
+    // MÉTODOS PÚBLICOS -------------------------------------------------------------------------------------
 
     // Lee desde fichero la lista de palabras positivas
     // y la almacena en el objeto. Si el fichero ha podido abrirse
@@ -167,7 +234,9 @@ namespace bblProg2
     // Parámetros:
     //  - nombre_fic (E): nombre del fichero de palabras positivas
     //  - res (S): resultado de la apertura del fichero para lectura
-    void cargarPalabrasPositivas(const std::string &nombre_fic, Resultado &res);
+    void Valoraciones::cargarPalabrasPositivas(const std::string &nombre_fic, Resultado &res) {
+        pal_pos.leerPalabras(nombre_fic, res);
+    }
 
     // Lee desde fichero la lista de palabras negativas
     // y la almacena en el objeto. Si el fichero ha podido abrirse
@@ -176,7 +245,9 @@ namespace bblProg2
     // Parámetros:
     //  - nombre_fic (E): nombre del fichero de palabras positivas
     //  - res (S): resultado de la apertura del fichero para lectura
-    void cargarPalabrasNegativas(const std::string &nombre_fic, Resultado &res);
+    void Valoraciones::cargarPalabrasNegativas(const std::string &nombre_fic, Resultado &res) {
+        pal_neg.leerPalabras(nombre_fic, res);
+    }
 
     // Lee valoraciones de un fichero de valoraciones y las incorpora
     // (añadiéndolas a las ya existentes) a la lista de valoraciones
@@ -204,7 +275,43 @@ namespace bblProg2
     // PARÁMETROS:
     //  - nombre_fic (E): nombre del fichero de valoraciones
     //  - res (S): resultado de la operación
-    void cargarValoraciones(const std::string &nombre_fic, Resultado &res);
+    void Valoraciones::cargarValoraciones(const std::string &nombre_fic, Resultado &res) {
+        ifstream f{nombre_fic};
+        if(f.fail()) {
+            res=FIC_ERROR;
+        }
+        else  {
+            unsigned id_alojamiento, id_valoracion, id_revisor; 
+            string fecha, nombre_revisor, comentario, aux;
+            Sentimiento sentimiento;
+            f.ignore(300, '\n');
+            while(!f.eof()) {
+                f>>id_alojamiento;
+                f.ignore();
+                f>>id_valoracion;
+                f.ignore();
+                getline(f, fecha, ',');
+                f>>id_revisor;
+                f.ignore();
+                getline(f, nombre_revisor, ','); // Se lee el nombre del revisor hasta encontrar una comilla
+                if(nombre_revisor[0]=='"') { // Si el primer caracter del nombre leído son comillas dobles, se debe almacenar hasta encontrar las siguientes comillas dobles
+                    getline(f, aux, '"');
+                    nombre_revisor.erase(nombre_revisor[0]); // Se borran las primeras comillas dobles
+                    nombre_revisor+=','+aux; // Se concatena con una coma y el resto del nombre
+                    f.ignore(); // Hay que ignorar la coma después de leer el nombre del revisor
+                }
+                getline(f, comentario); // Dinámica similar
+                if(comentario[0]=='"') {
+                    comentario.erase(comentario[0]);
+                    comentario.erase(comentario.end());
+                }
+                Valoracion nueva(id_alojamiento, id_revisor, fecha, id_revisor, nombre_revisor, comentario, sentimiento);
+                nueva.analizarSentimiento(pal_pos, pal_neg, 0, sentimiento);
+                insertarValoracion(nueva, res);
+            }
+            res=OK;
+        }
+    }
 
     // Guarda en el fichero cuyo nombre se pasa como parámetro todas las valoraciones
     // de la lista de valoraciones.
@@ -215,51 +322,125 @@ namespace bblProg2
     // PARÁMETROS:
     //  - nombre_fic (E): nombre del fichero de escritura
     //  - res (S): resultado de la operación
-    void guardarValoraciones(const std::string &nombre_fic, Resultado &res) const;
+    void Valoraciones::guardarValoraciones(const std::string &nombre_fic, Resultado &res) const {
+        ofstream f{nombre_fic};
+        if(f.fail()) {
+            res=FIC_ERROR;
+        }
+        else {
+            f<<"id_alojamiento,id_valoracion,fecha,id_revisor,nombre_revisor,comentario"<<endl;
+            PtrValoracion ptr=valoraciones;
+            while(ptr!=nullptr) {
+                f<<ptr->valoracion.consultarIdAlojamiento()<<",";
+                f<<ptr->valoracion.consultarIdValoracion()<<",";
+                f<<ptr->valoracion.consultarFecha()<<",";
+                f<<ptr->valoracion.consultarIdRevisor()<<",";
+                if(ptr->valoracion.consultarNombreRevisor().find(',')!=string::npos) {
+                    f<<'"'<<ptr->valoracion.consultarNombreRevisor()<<'"'<<',';
+                }
+                else {
+                    f<<ptr->valoracion.consultarNombreRevisor()<<',';
+                }
+                if(ptr->valoracion.consultarComentarios().find(',')!=string::npos) {
+                    f<<'"'<<ptr->valoracion.consultarComentarios()<<'"';
+                }
+                else {
+                    f<<ptr->valoracion.consultarComentarios();
+                }
+                ptr=ptr->sig;
+            }
+            res=OK;
+        }
+    }
 
     // Analiza y actualiza el sentimiento de una valoración cuyo identificador se pasa como parámetro.
     // Si la valoración está en la lista de valoraciones del objeto, se analiza y actualiza
     // su sentimiento en función del umbral que se pasa como parámetro; además, se devuelve
     // OK a través de 'res'. Si no existe la valoración, se devuelve NO_EXISTE a través de 'res'.
-    void actualizarSentimiento(unsigned id_valoracion, unsigned umbral, Resultado &res);
+    void Valoraciones::actualizarSentimiento(unsigned id_valoracion, unsigned umbral, Resultado &res) {
+        Valoracion valoracion;
+        Sentimiento sentimiento;
+        bool encontrada;
+        buscarValoracion(id_valoracion, valoracion, encontrada);
+        if(!encontrada) {
+            res=NO_EXISTE;
+        }
+        else {
+           valoracion.analizarSentimiento(pal_pos, pal_neg, umbral, sentimiento);
+           valoracion.asignarSentimiento(sentimiento);
+           res=OK;
+        }
+    }
 
     // Analiza y actualiza el sentimiento de todas las valoraciones a partir de las listas de palabras
     // positivas y negativas actuales almacenadas en el objeto y en función del umbral
     // indicado.
     // Parámetros:
     //  - umbral (E): umbral para clasificar la valoración en positiva, negativa o neutra
-    void actualizarSentimientos(unsigned umbral);
+    void Valoraciones::actualizarSentimientos(unsigned umbral) {
+        PtrValoracion ptr=valoraciones;
+        Resultado res;
+        while(ptr!=nullptr) {
+            actualizarSentimiento(ptr->valoracion.consultarIdValoracion(), umbral, res);
+            ptr=ptr->sig;
+        }
+    }
 
     // Inserta una nueva palabra en la lista de palabras positivas
     // Parámetros:
     //  - palabra (E): nueva palabra a insertar en la lista de palabras positivas
     //  - res (S): resultado de la operación
-    void insertarPalabraPositiva(const std::string &palabra, Resultado &res);
+    void Valoraciones::insertarPalabraPositiva(const std::string &palabra, Resultado &res) {
+        pal_pos.insertar(palabra, res);
+    }
 
     // Inserta una nueva palabra en la lista de palabras negativas
     // Parámetros:
     //  - palabra (E): nueva palabra a insertar en la lista de palabras negativas
     //  - res (S): resultado de la operación
-    void insertarPalabraNegativa(const std::string &palabra, Resultado &res);
+    void Valoraciones::insertarPalabraNegativa(const std::string &palabra, Resultado &res) {
+        pal_neg.insertar(palabra, res);
+    }
 
     // Elimina una nueva palabra de la lista de palabras positivas
     // Parámetros:
     //  - palabra (E): palabra a eliminar de la lista de palabras positivas
     //  - res (S): resultado de la operación
-    void eliminarPalabraPositiva(const std::string &palabra, Resultado &res);
+    void Valoraciones::eliminarPalabraPositiva(const std::string &palabra, Resultado &res) {
+        pal_pos.eliminar(palabra, res);
+    }
 
     // Elimina una nueva palabra de la lista de palabras negativas
     // Parámetros:
     //  - palabra (E): palabra a eliminar de la lista de palabras negativas
     //  - res (S): resultado de la operación
-    void eliminarPalabraNegativa(const std::string &palabra, Resultado &res);
+    void Valoraciones::eliminarPalabraNegativa(const std::string &palabra, Resultado &res) {
+        pal_neg.eliminar(palabra, res);
+    }
 
     // Devuelve el número de valoraciones positivas, negativas y neutras almacenadas.
     // PARÁMETROS:
     //  - positivas (S): número de valoraciones positivas
     //  - negativas (S): número de valoraciones negativas
     //  - neutras (S): número de valoraciones neutras
-    void numeroValoraciones(unsigned &positivas, unsigned &negativas, unsigned &neutras) const;
+    void Valoraciones::numeroValoraciones(unsigned &positivas, unsigned &negativas, unsigned &neutras) const {
+        positivas=0; negativas=0; neutras=0;
+        Sentimiento sent;
+        PtrValoracion ptr=valoraciones;
+        while(ptr!=nullptr) {
+            sent=ptr->valoracion.consultarSentimiento();
+            if(sent==positivo) {
+                ++positivas;
+            }
+            else if(sent==negativo) {
+                ++negativas;
+            }
+            else {
+                ++neutras;
+            }
+            ptr=ptr->sig;
+        }
+    }
 
     // Devuelve la lista de los identificadores de todas las valoraciones
     // almacenadas, positivas, negativas y neutras.
@@ -267,13 +448,35 @@ namespace bblProg2
     //  - ids_positivas (S): ids de todas las valoraciones positivas
     //  - ids_negativas (S): ids de todas las valoraciones negativas
     //  - ids_neutras (S): ids de todas las valoraciones neutras
-    void listaValoraciones(Ids &ids_positivas, Ids &ids_negativas, Ids &ids_neutras) const;
+    void Valoraciones::listaValoraciones(Ids &ids_positivas, Ids &ids_negativas, Ids &ids_neutras) const {
+        Sentimiento sent;
+        PtrValoracion ptr=valoraciones;
+        unsigned pos=0, neg=0, n=0;
+        while(ptr!=nullptr) {
+            ptr->valoracion.analizarSentimiento(pal_pos, pal_neg, 0, sent);
+            if(sent==positivo) {
+                ids_positivas.ids[pos++]=ptr->valoracion.consultarIdValoracion();
+                ++ids_positivas.num_ids;
+            }
+            else if(sent==negativo) {
+                ids_negativas.ids[neg++]=ptr->valoracion.consultarIdValoracion();
+                ++ids_negativas.num_ids;
+            }
+            else {
+                ids_neutras.ids[n++]=ptr->valoracion.consultarIdValoracion();
+                ++ids_neutras.num_ids;
+            }
+        }
+    }
 
     // Devuelve el número de palabras positivas y negativas almacenadas
     // PARÁMETROS:
     //  - positivas (S): número de palabras positivas
     //  - negativas (S): número de palabras negativas
-    void numeroPalabras(unsigned &positivas, unsigned &negativas) const;
+    void Valoraciones::numeroPalabras(unsigned &positivas, unsigned &negativas) const {
+        positivas=pal_pos.numPalabras();
+        negativas=pal_neg.numPalabras();
+    }
 
     // Indica si una valoración, cuyo id se pasa como parámetro,
     // está en la lista de valoraciones.
@@ -282,7 +485,18 @@ namespace bblProg2
     //  - id_valoracion (E): identificador de la valoración a buscar
     //  - valoracion (S): valoración
     //  - encontrada (S): indica si se ha encontrado (true) o no (false) la valoración
-    void buscarValoracion(unsigned id_valoracion, Valoracion &valoracion, bool &encontrada) const;
+    void Valoraciones::buscarValoracion(unsigned id_valoracion, Valoracion &valoracion, bool &encontrada) const {
+        encontrada=false;
+        PtrValoracion ptr=valoraciones;
+        while(ptr!=nullptr && !encontrada) {
+            encontrada=ptr->valoracion.consultarIdValoracion()>=id_valoracion;
+            ptr=ptr->sig;
+        }
+        encontrada=ptr->valoracion.consultarIdValoracion()==id_valoracion;
+        if(encontrada) {
+            valoracion=ptr->valoracion;
+        }
+    }
 
     // Inserta una valoración en la lista de valoraciones, en orden creciente
     // de identificador de valoración. No puede haber dos valoraciones repetidas
@@ -292,7 +506,10 @@ namespace bblProg2
     // PARÁMETROS:
     //  - valoracion (E): valoración a insertar
     //  - res (S): resultado de la operación
-    void insertarValoracion(const Valoracion &valoracion, Resultado &res);
+    void Valoraciones::insertarValoracion(const Valoracion &valoracion, Resultado &res) {
+        insertarValoracion(valoracion, valoraciones, res);
+        ++num_valoraciones;
+    }
 
     // Elimina una valoración cuyo id se pasa como parámetro.
     // Si la valoración se encuentra, se devuelve OK a través de
@@ -300,29 +517,61 @@ namespace bblProg2
     // PARÁMETROS:
     //  - id_valoracion (E): valoración que quiere elminarse
     //  - res (S): resultado de la operación
-    void eliminarValoracion(unsigned id_valoracion, Resultado &res);
+    void Valoraciones::eliminarValoracion(unsigned id_valoracion, Resultado &res) {
+        eliminarValoracion(id_valoracion, valoraciones, res);
+    }
 
     // Modificar una valoración existente con los nuevos datos de la misma que se pasan
     // a través del parámetro 'valoracion'. Si la valoración existe
     // (existe ese id de valoración) se modifica (se sustituye por la nueva
     // valoración) y se devuelve OK a través de 'res'.
     // Si no, se devuelve NO_EXISTE.
-    // Parámtros:
+    // Parámetros:
     //  - valoracion (E): nueva valoración (para sustituir la existente)
     //  - res (S): resultado de la operación
-    void modificarValoracion(const Valoracion &valoracion, Resultado &res);
+    void Valoraciones::modificarValoracion(const Valoracion &valoracion, Resultado &res) {
+        Valoracion aux;
+        PtrValoracion ptr, ant;
+        bool encontrada;
+        buscarValoracion(valoracion.consultarIdValoracion(), valoraciones, ptr, ant, encontrada);
+        if(!encontrada) {
+            res=NO_EXISTE;
+        }
+        else {
+            delete(ptr);
+            insertarValoracion(valoracion, res);
+        }
+    }
 
     // Devuelve la lista de identificadores de valoraciones.
     // PARÁMETROS:
     //  - id_alojamiento (E): identificador de un alojamiento
     //  - ids_valoraciones (S): lista de ids de valoraciones del alojamiento
-    void valoracionesAlojamiento(unsigned id_alojamiento, Ids &ids_valoraciones) const;
+    void Valoraciones::valoracionesAlojamiento(unsigned id_alojamiento, Ids &ids_valoraciones) const {
+        PtrValoracion ptr=valoraciones;
+        unsigned i=0;
+        while(ptr!=nullptr && ids_valoraciones.num_ids<ids_valoraciones.ids.size()) {
+            if(ptr->valoracion.consultarIdAlojamiento()==id_alojamiento) {
+                ids_valoraciones.ids[i++]=ptr->valoracion.consultarIdValoracion();
+                ++ids_valoraciones.num_ids;
+            }
+        }
+    }
 
     // Devuelve la lista de valoraciones para un determinado revisor.
     // PARÁMETROS:
     //  - id_revisor (E): identificador de un revisor
     //  - ids_valoraciones (S): lista de ids de valoraciones del revisor
-    void valoracionesRevisor(unsigned id_revisor, Ids &ids_valoraciones) const;
+    void Valoraciones::valoracionesRevisor(unsigned id_revisor, Ids &ids_valoraciones) const {
+        PtrValoracion ptr=valoraciones;
+        unsigned i=0;
+        while(ptr!=nullptr && ids_valoraciones.num_ids<ids_valoraciones.ids.size()) {
+            if(ptr->valoracion.consultarIdRevisor()==id_revisor) {
+                ids_valoraciones.ids[i++]=ptr->valoracion.consultarIdValoracion();
+                ++ids_valoraciones.num_ids;
+            }
+        }
+    }
 
     // Escribe por pantalla los datos de todas las valoraciones,
     // en el siguiente formato (nótese que se
@@ -337,5 +586,17 @@ namespace bblProg2
     //  *** SENTIMIENTO: positivo/negativo/neutro
     //
     // Deben salir primero las valoraciones positivas y luego las negativas.
-    void escribir() const;
+    void Valoraciones::escribir() const {
+        PtrValoracion ptr=valoraciones;
+        while(ptr!=nullptr) {
+            cout<<"--- ID alojamiento:"<<'\t'<<ptr->valoracion.consultarIdAlojamiento()<<endl;
+            cout<<"ID valoración:"<<'\t'<<ptr->valoracion.consultarIdValoracion()<<endl;
+            cout<<"Fecha::"<<'\t'<<ptr->valoracion.consultarFecha()<<endl;
+            cout<<"ID revisor:"<<'\t'<<ptr->valoracion.consultarIdRevisor()<<endl;
+            cout<<"Nombre revisor:"<<'\t'<<ptr->valoracion.consultarNombreRevisor()<<endl;
+            cout<<"--- COMENTARIO:"<<endl<<ptr->valoracion.consultarComentarios()<<endl;
+            cout<<"*** SENTIMIENTO: "<<ptr->valoracion.consultarSentimiento()<<endl<<endl;
+            ptr=ptr->sig;
+        }
+    }
 } // namespace bblProg2
